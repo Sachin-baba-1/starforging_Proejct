@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <!-- Close Button for Photo Preview -->
+    <ImageView
+        android:id="@+id/closePhotoPreview"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_close"
+        android:contentDescription="Close Preview"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- RecyclerView for Camera Extensions -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/extensionSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@id/cameraShutter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Camera Preview -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        tools:background="#2196F3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <!-- Input Field for Image Count -->
+        <EditText
+            android:id="@+id/input_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Enter number of images"
+            android:inputType="number"
+            android:padding="12dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/previewView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.camera.view.PreviewView>
+
+    <LinearLayout
+        android:id="@+id/permissionsRationaleContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/permissionsRationale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera permissions required."
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/permissionsRequestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Request Permission"
+            android:layout_marginTop="8dp"/>
+        <TextView
+            android:id="@+id/latencyEstimateIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Processing latency: 0ms"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+
+
+    <!-- Input Field for Image Count -->
+
+    <!-- Button to Start Capture -->
+
+    <View
+        android:id="@+id/focusPoint"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/focus_ring"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
+
+    <ImageView
+        android:id="@+id/photoPostview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+
+
+    <Button
+        android:id="@+id/start_capture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Capture"
+        android:textSize="16sp"
+        android:backgroundTint="@color/button"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/cameraShutter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="16dp"/>
+    <ImageView
+        android:id="@+id/photoPreview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Photo Preview"
+        app:layout_constraintTop_toBottomOf="@id/start_capture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+
+    <!-- Camera Shutter Button -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cameraShutter"
+        android:layout_width="92dp"
+        android:layout_height="92dp"
+        android:layout_margin="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_camera_shutter"
+        app:tint="@color/button" />
+
+    <!-- Switch Lens Button -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/switchLens"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="32dp"
+        android:background="@drawable/circle_background"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/cameraShutter"
+        app:layout_constraintEnd_toStartOf="@id/cameraShutter"
+        app:layout_constraintTop_toTopOf="@id/cameraShutter"
+        app:srcCompat="@drawable/ic_flip_camera_android"
+        app:tint="@color/button" />
+
+    <!-- Circular Progress Indicator for Processing -->
+    <LinearLayout
+        android:id="@+id/processProgressContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/selector_background"
+        android:gravity="center"
+        android:visibility="gone"
+        android:paddingHorizontal="84dp"
+        android:paddingVertical="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="#FFBE0B"
+            android:textSize="16sp"
+            android:text="@string/hold_still"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/processProgressIndicator"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            app:indicatorSize="64dp"
+            app:indicatorColor="#FFBE0B"
+            app:trackColor="#272727"
+            app:trackThickness="6dp"
+            app:trackCornerRadius="3dp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
