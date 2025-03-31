@@ -15,6 +15,7 @@
   -->
 
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <external-media-path name="media" path="." />
+    <external-files-path name="images" path="Android/data/com.example.android.cameraxextensions/files/Pictures/" />
+
     <files-path name="files" path="."/>
 </paths>

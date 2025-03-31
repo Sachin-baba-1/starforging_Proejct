@@ -66,6 +66,9 @@ android {
 }
 
 dependencies {
+
+    //server
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     // Kotlin lang
     implementation 'androidx.core:core-ktx:1.13.1'
 

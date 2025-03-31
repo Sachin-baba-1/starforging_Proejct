@@ -2,7 +2,9 @@ package com.example.android.cameraxextensions
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -23,6 +25,16 @@ import com.example.android.cameraxextensions.repository.ImageCaptureRepository
 import com.example.android.cameraxextensions.viewmodel.CameraExtensionsViewModel
 import com.example.android.cameraxextensions.viewmodel.CameraExtensionsViewModelFactory
 import kotlinx.coroutines.launch
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.Response
+import okio.IOException
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -134,8 +146,9 @@ class MainActivity : AppCompatActivity() {
         val imageCapture = imageCapture ?: return
 
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis())
+        val fileName = "IMG_$timestamp.jpg"
         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_$timestamp.jpg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/CameraXPhotos")
         }
@@ -151,8 +164,13 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    Log.d("CameraX", "Photo captured and saved to DCIM/CameraXPhotos")
-                    Toast.makeText(this@MainActivity, "Photo saved to DCIM/CameraXPhotos!", Toast.LENGTH_SHORT).show()
+                    Log.d("CameraX", "Photo saved to DCIM/CameraXPhotos")
+                    Toast.makeText(this@MainActivity, "Photo saved!", Toast.LENGTH_SHORT).show()
+
+                    // Send the image to the server
+                    val imageUri = outputFileResults.savedUri ?: return
+                    sendImageToServer(imageUri, this@MainActivity) // Pass URI instead of String
+
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -162,6 +180,55 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
+    private fun getRealPathFromURI(uri: Uri, context: Context): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            if (cursor.moveToFirst()) {
+                return cursor.getString(columnIndex)
+            }
+        }
+
+        // Fallback for Android 10+ using a temporary file
+        return uri.let { safeUri ->
+            val inputStream = context.contentResolver.openInputStream(safeUri) ?: return null
+            val tempFile = File(context.cacheDir, "temp_image.jpg")
+            tempFile.outputStream().use { outputStream -> inputStream.copyTo(outputStream) }
+            tempFile.absolutePath
+        }
+    }
+
+
+    private fun sendImageToServer(imageUri: Uri, context: Context) {
+        val imagePath = getRealPathFromURI(imageUri, context) ?: return
+        val file = File(imagePath)
+
+        val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val multipartBody = MultipartBody.Part.createFormData("file", file.name, requestBody)
+
+        val request = Request.Builder()
+            .url("http://192.168.1.38:5000/upload")
+            .post(MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.name, requestBody)
+                .build())
+            .build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Upload", "Failed to upload image: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                Log.d("Upload", "Server response: ${response.code} - ${response.body?.string()}")
+            }
+        })
+    }
+
+
+
+
+
 
     companion object {
         private const val CAMERA_PERMISSION_REQUEST = 1001
